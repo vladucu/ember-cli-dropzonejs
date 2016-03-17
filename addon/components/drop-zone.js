@@ -117,7 +117,6 @@ export default Ember.Component.extend({
       reset: this.reset,
       queuecomplete: this.queuecomplete,
       files: this.files,
-      accept: this.accept,
     };
 
     for (let e in events) {
@@ -149,6 +148,7 @@ export default Ember.Component.extend({
 
       // resize: not available
       acceptedFiles: this.acceptedFiles,
+      accept: this.accept,
       autoProcessQueue: this.autoProcessQueue,
       forceFallback: this.forceFallback,
       previewTemplate: this.previewTemplate,
