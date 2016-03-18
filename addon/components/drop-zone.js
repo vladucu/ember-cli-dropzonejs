@@ -85,7 +85,10 @@ export default Ember.Component.extend({
   files: null,
 
   // Callback functions
-  accept: null,
+
+  accept: function(file, cb) {
+    cb();
+  },
 
   setEvents() {
     let myDropzone = this.get('myDropzone');
@@ -121,7 +124,7 @@ export default Ember.Component.extend({
 
     for (let e in events) {
       if (events[e] !== null) {
-        myDropzone.on(e, events[e]);
+        myDropzone.on(e, events[e].bind(this));
       }
     }
   },
