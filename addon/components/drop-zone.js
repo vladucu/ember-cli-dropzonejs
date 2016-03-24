@@ -151,7 +151,7 @@ export default Ember.Component.extend({
 
       // resize: not available
       acceptedFiles: this.acceptedFiles,
-      accept: this.accept,
+      accept: this.accept.bind(this),
       autoProcessQueue: this.autoProcessQueue,
       forceFallback: this.forceFallback,
       previewTemplate: this.previewTemplate,
