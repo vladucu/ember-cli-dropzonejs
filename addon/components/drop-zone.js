@@ -119,7 +119,6 @@ export default Ember.Component.extend({
       totaluploadprogress: this.totaluploadprogress,
       reset: this.reset,
       queuecomplete: this.queuecomplete,
-      files: this.files,
     };
 
     for (let e in events) {
@@ -208,12 +207,11 @@ export default Ember.Component.extend({
         _this.myDropzone.emit('addedfile', dropfile);
 
         if (typeof (thumbnail) === 'string') {
-
           _this.myDropzone.emit('thumbnail', dropfile, thumbnail);
         }
 
         _this.myDropzone.emit('complete', dropfile);
-        _this.myDropzone.files.push(file);
+        _this.myDropzone.files.push(dropfile);
       });
     }
 
