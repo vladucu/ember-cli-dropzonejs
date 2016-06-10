@@ -198,16 +198,15 @@ export default Ember.Component.extend({
           size: file.get('size'),
           status: Dropzone.ADDED,
         };
-        let thumbnail = file.get('thumbnail');
-
-        if (typeof (thumbnail) === 'string') {
-          dropfile.thumbnail = thumbnail;
-        }
-
         _this.myDropzone.emit('addedfile', dropfile);
 
-        if (typeof (thumbnail) === 'string') {
+        let thumbnail = file.get('thumbnail');
+        let url = file.get('url');
+        if (!Ember.isBlank(thumbnail)) {
+          dropfile.thumbnail = thumbnail;
           _this.myDropzone.emit('thumbnail', dropfile, thumbnail);
+        } else if (!Ember.isBlank(url)) {
+          _this.myDropzone.createThumbnailFromUrl(dropfile, url, function() {}, "Anonymous");
         }
 
         _this.myDropzone.emit('complete', dropfile);
