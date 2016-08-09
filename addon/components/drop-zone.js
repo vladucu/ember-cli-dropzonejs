@@ -13,7 +13,6 @@ export default Ember.Component.extend({
   // Configuration Options
 
   url: '#',
-  withCredentials: null,
   method: null,
   parallelUploads: null,
   maxFilesize: null,
@@ -24,6 +23,7 @@ export default Ember.Component.extend({
   addRemoveLinks: null,
   previewsContainer: null,
   clickable: null,
+  createImageThumbnails: false,
   maxThumbnailFilesize: null,
   thumbnailWidth: null,
   thumbnailHeight: null,
@@ -85,10 +85,9 @@ export default Ember.Component.extend({
   files: null,
 
   // Callback functions
-
-  accept: function(file, cb) {
-    cb();
-  },
+  initDropzone: null,
+  accept: null,
+  renameFilename: null,
 
   setEvents() {
     let myDropzone = this.get('myDropzone');
@@ -118,7 +117,7 @@ export default Ember.Component.extend({
       canceledmultiple: this.canceledmultiple,
       totaluploadprogress: this.totaluploadprogress,
       reset: this.reset,
-      queuecomplete: this.queuecomplete,
+      queuecomplete: this.queuecomplete
     };
 
     for (let e in events) {
@@ -156,7 +155,6 @@ export default Ember.Component.extend({
     let dropzoneOptions = {};
     let dropzoneConfig = {
       url: this.url,
-      withCredentials: this.withCredentials,
       method: this.method,
       parallelUploads: this.parallelUploads,
       maxFilesize: this.maxFilesize,
@@ -167,6 +165,7 @@ export default Ember.Component.extend({
       addRemoveLinks: this.addRemoveLinks,
       previewsContainer: this.previewsContainer,
       clickable: this.clickable,
+      createImageThumbnails: this.createImageThumbnails,
       maxThumbnailFilesize: this.maxThumbnailFilesize,
       thumbnailWidth: this.thumbnailWidth,
       thumbnailHeight: this.thumbnailHeight,
@@ -174,10 +173,12 @@ export default Ember.Component.extend({
 
       // resize: not available
       acceptedFiles: this.acceptedFiles,
-      accept: this.accept.bind(this),
+      accept: this.accept,
+      renameFilename: this.renameFilename,
       autoProcessQueue: this.autoProcessQueue,
-      forceFallback: this.forceFallback,
       previewTemplate: this.previewTemplate,
+      forceFallback: this.forceFallback,
+      fallback: this.fallback,
 
       // Dropzone translations
       dictDefaultMessage: this.dictDefaultMessage,
@@ -200,7 +201,11 @@ export default Ember.Component.extend({
     for (let option in dropzoneConfig) {
       let data = dropzoneConfig[option];
       if (data !== null) {
-        dropzoneOptions[option] = data;
+         if (typeof(data) === 'function') {
+          dropzoneOptions[option] = data.bind(this);
+         } else {
+          dropzoneOptions[option] = data;
+         }
       } else if (option === 'thumbnailHeight' || option === 'thumbnailWidth') {
         dropzoneOptions[option] = data;
       }
@@ -226,15 +231,20 @@ export default Ember.Component.extend({
           type: file.get('type'),
           size: file.get('size'),
           status: Dropzone.ADDED,
+          accepted: true
         };
-        _this.myDropzone.emit('addedfile', dropfile);
 
         let thumbnail = file.get('thumbnail');
-        let url = file.get('url');
         if (!Ember.isBlank(thumbnail)) {
           dropfile.thumbnail = thumbnail;
+        }
+
+        _this.myDropzone.emit('addedfile', dropfile);
+
+        let url = file.get('url');
+        if (!Ember.isBlank(thumbnail)) {
           _this.myDropzone.emit('thumbnail', dropfile, thumbnail);
-        } else if (!Ember.isBlank(url)) {
+        } else {
           _this.myDropzone.createThumbnailFromUrl(dropfile, url, function() {}, "Anonymous");
         }
 
