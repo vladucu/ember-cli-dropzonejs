@@ -6,8 +6,6 @@ export default Ember.Component.extend({
 
   myDropzone:undefined,
 
-  element: null,
-
   dropzoneOptions: null,
 
   // Configuration Options
@@ -28,6 +26,7 @@ export default Ember.Component.extend({
   thumbnailWidth: null,
   thumbnailHeight: null,
   maxFiles: null,
+  createImageThumbnails: null,
 
   // resize: not available
   acceptedFiles: null,
@@ -146,7 +145,7 @@ export default Ember.Component.extend({
             }
           }
         };
-      }).call(dropzoneInstance.element);
+      }).call(this, dropzoneInstance.element);
 
       dropzoneInstance.on('dragenter', onDrag.enter);
       dropzoneInstance.on('dragleave', onDrag.leave);
@@ -170,6 +169,7 @@ export default Ember.Component.extend({
       thumbnailWidth: this.thumbnailWidth,
       thumbnailHeight: this.thumbnailHeight,
       maxFiles: this.maxFiles,
+      createImageThumbnails: this.createImageThumbnails,
 
       // resize: not available
       acceptedFiles: this.acceptedFiles,
@@ -223,7 +223,11 @@ export default Ember.Component.extend({
     this.getDropzoneOptions();
     Dropzone.autoDiscover = false;
     this.createDropzone(this.element);
+    //make sure events are set before any files are added
+    this.setEvents();
 
+    //this condition requires a fully resolved array to work
+    //will not work with model.get('files') as it returns promise not array hence length condition is failed
     if (this.files && this.files.length > 0) {
       this.files.map(function(file) {
         let dropfile = {
@@ -231,11 +235,13 @@ export default Ember.Component.extend({
           type: file.get('type'),
           size: file.get('size'),
           status: Dropzone.ADDED,
-          accepted: true
+          // accepted: true
+          //add support for id  in files object so that it can be access in addedFile,removedFile callbacks for files identified by id
+          id: file.get('id')
         };
 
         let thumbnail = file.get('thumbnail');
-        if (!Ember.isBlank(thumbnail)) {
+        if (typeof (thumbnail) === 'string') {
           dropfile.thumbnail = thumbnail;
         }
 
@@ -253,7 +259,6 @@ export default Ember.Component.extend({
       });
     }
 
-    this.setEvents();
     return this.myDropzone;
   }),
 });
