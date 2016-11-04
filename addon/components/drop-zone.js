@@ -235,7 +235,6 @@ export default Ember.Component.extend({
           type: file.get('type'),
           size: file.get('size'),
           status: Dropzone.ADDED,
-          // accepted: true
           //add support for id  in files object so that it can be access in addedFile,removedFile callbacks for files identified by id
           id: file.get('id')
         };
