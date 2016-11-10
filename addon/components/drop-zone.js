@@ -248,6 +248,11 @@ export default Ember.Component.extend({
 
         _this.myDropzone.emit('complete', dropfile);
         _this.myDropzone.files.push(file);
+
+        if (!Ember.isNone(_this.myDropzone.options.maxFiles)) {
+          // If maxFiles option is used, make sure you adjust it to the correct amount
+          _this.myDropzone.options.maxFiles -= 1;
+        }
       });
     }
 
