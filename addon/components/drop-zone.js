@@ -5,7 +5,7 @@ export default Ember.Component.extend({
   classNames: ['dropzone'],
 
   myDropzone:undefined,
-  
+
   dropzoneOptions: null,
 
   // Configuration Options
@@ -115,8 +115,7 @@ export default Ember.Component.extend({
       totaluploadprogress: this.totaluploadprogress,
       reset: this.reset,
       queuecomplete: this.queuecomplete,
-      files: this.files,
-      accept: this.accept,
+      files: this.files
     };
 
     for (let e in events) {
@@ -189,6 +188,9 @@ export default Ember.Component.extend({
       dictRemoveFile: this.dictRemoveFile,
       dictMaxFilesExceeded: this.dictMaxFilesExceeded,
 
+      // Callback functions
+      accept: this.accept,
+
       // Fix flickering dragging over child elements: https://github.com/enyo/dropzone/issues/438
       dragenter: Ember.$.noop,
       dragleave: Ember.$.noop,
@@ -229,7 +231,7 @@ export default Ember.Component.extend({
           size: file.get('size'),
           status: Dropzone.ADDED,
           //add support for id  in files object so that it can be access in addedFile,removedFile callbacks for files identified by id
-          id: file.get('id') 
+          id: file.get('id')
         };
         let thumbnail = file.get('thumbnail');
 
