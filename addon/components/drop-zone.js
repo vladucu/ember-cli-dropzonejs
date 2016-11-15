@@ -230,6 +230,7 @@ export default Ember.Component.extend({
           type: file.get('type'),
           size: file.get('size'),
           status: Dropzone.ADDED,
+          accepted: true,
           //add support for id  in files object so that it can be access in addedFile,removedFile callbacks for files identified by id
           id: file.get('id')
         };
@@ -242,17 +243,11 @@ export default Ember.Component.extend({
         _this.myDropzone.emit('addedfile', dropfile);
 
         if (typeof (thumbnail) === 'string') {
-
           _this.myDropzone.emit('thumbnail', dropfile, thumbnail);
         }
 
         _this.myDropzone.emit('complete', dropfile);
-        _this.myDropzone.files.push(file);
-
-        if (!Ember.isNone(_this.myDropzone.options.maxFiles)) {
-          // If maxFiles option is used, make sure you adjust it to the correct amount
-          _this.myDropzone.options.maxFiles -= 1;
-        }
+        _this.myDropzone.files.push(dropfile);
       });
     }
 
