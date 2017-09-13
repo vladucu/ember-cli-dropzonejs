@@ -1,11 +1,14 @@
 /* global Dropzone*/
 import Ember from 'ember';
+import layout from '../templates/drop-zone'
 
 export default Ember.Component.extend({
+  layout,
+
   classNames: ['dropzone'],
 
   myDropzone:undefined,
-  
+
   dropzoneOptions: null,
 
   // Configuration Options
@@ -229,7 +232,7 @@ export default Ember.Component.extend({
           size: file.get('size'),
           status: Dropzone.ADDED,
           //add support for id  in files object so that it can be access in addedFile,removedFile callbacks for files identified by id
-          id: file.get('id') 
+          id: file.get('id')
         };
         let thumbnail = file.get('thumbnail');
 
