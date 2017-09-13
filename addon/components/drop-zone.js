@@ -1,6 +1,6 @@
 /* global Dropzone*/
 import Ember from 'ember';
-import layout from '../templates/components/drop-zone'
+import layout from '../templates/components/drop-zone';
 
 export default Ember.Component.extend({
   layout,
