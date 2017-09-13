@@ -1,10 +1,13 @@
 /* global Dropzone*/
 import Ember from 'ember';
+import layout from '../templates/components/drop-zone';
 
 export default Ember.Component.extend({
+  layout,
+
   classNames: ['dropzone'],
 
-  myDropzone:undefined,
+  myDropzone: undefined,
 
   dropzoneOptions: null,
 
@@ -253,4 +256,16 @@ export default Ember.Component.extend({
 
     return this.myDropzone;
   }),
+
+  init() {
+    this._super(...arguments);
+
+    this.set('myDropzoneAPI', {
+      open: this.open.bind(this),
+    });
+  },
+
+  open() {
+    this.get('myDropzone').hiddenFileInput.click();
+  },
 });
