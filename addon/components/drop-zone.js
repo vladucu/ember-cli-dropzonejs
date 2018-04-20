@@ -158,7 +158,7 @@ export default Ember.Component.extend({
       }
     });
 
-    Ember.assert('Url is required for dropzone', output.url);
+    // Ember.assert('Url is required for dropzone', output.url);
     // Preserve defaults for existing apps/tests
     if (!output.url) {
       output.url = '#';
