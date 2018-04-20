@@ -7,57 +7,55 @@ export default Ember.Component.extend({
 
   classNames: ['dropzone'],
 
-  myDropzone: undefined,
+  /**
+   * Dropzone dom element
+   * @private
+   * @type {[type]}
+   */
+  myDropzone: (typeof FastBoot === 'undefined') ? document.body : undefined,
 
+  /**
+   * internal configurtion for Dropzone method
+   * @private
+   * @type {[type]}
+   */
   dropzoneOptions: null,
 
-  // Configuration Options
+  /**
+   * list of available properties
+   * @type {Array}
+   */
+  dzOptionsList: [
+    'url', 'withCredentials', 'method', 'parallelUploads', 'maxFilesize', 'filesizeBase',
+    'paramName', 'uploadMultiple', 'headers', 'addRemoveLinks', 'previewsContainer',
+    'clickable', 'maxThumbnailFilesize', 'thumbnailWidth', 'thumbnailHeight', 'maxFiles',
+    'createImageThumbnails', 'params', 'acceptedFiles', 'autoProcessQueue', 'forceFallback',
+    'previewTemplate', 'dictDefaultMessage', 'dictFallbackMessage', 'dictInvalidFileType',
+    'dictFallbackText', 'dictFileTooBig', 'dictResponseError', 'dictCancelUpload',
+    'dictCancelUploadConfirmation', 'dictRemoveFile', 'dictMaxFilesExceeded', 'maxDropRegion'
+  ],
 
-  url: '#',
-  withCredentials: null,
-  method: null,
-  parallelUploads: null,
-  maxFilesize: null,
-  filesizeBase: null,
-  paramName: null,
-  uploadMultiple: null,
-  headers: null,
-  addRemoveLinks: null,
-  previewsContainer: null,
-  clickable: null,
-  maxThumbnailFilesize: null,
-  thumbnailWidth: null,
+  /**
+   * Configuration Hash to set dynamic properties
+   * @public
+   * @type {Object}
+   */
+  config: {},
+
+  // Need to preserve null default values
   thumbnailHeight: null,
-  maxFiles: null,
-  createImageThumbnails: null,
-
-  // resize: not available
-  acceptedFiles: null,
-  autoProcessQueue: null,
-  forceFallback: null,
-  previewTemplate: null,
-
-  // Dropzone translations
-  dictDefaultMessage: null,
-  dictFallbackMessage: null,
-  dictFallbackText: null,
-  dictInvalidFileType: null,
-  dictFileTooBig: null,
-  dictResponseError: null,
-  dictCancelUpload: null,
-  dictCancelUploadConfirmation: null,
-  dictRemoveFile: null,
-  dictMaxFilesExceeded: null,
+  thumbnailWidth: null,
 
   // Events
-
   // All of these receive the event as first parameter:
   drop: null,
   dragstart: null,
   dragend: null,
-  dragenter: null,
-  dragover: null,
   dragleave: null,
+
+  //noops
+  dragenter() {},
+  dragover() {},
 
   // All of these receive the file as first parameter:
   addedfile: null,
@@ -89,6 +87,10 @@ export default Ember.Component.extend({
   // Callback functions
   accept: null,
 
+  /**
+   * @private
+   * event management
+   */
   setEvents() {
     let myDropzone = this.get('myDropzone');
     let events = {
@@ -118,7 +120,9 @@ export default Ember.Component.extend({
       totaluploadprogress: this.totaluploadprogress,
       reset: this.reset,
       queuecomplete: this.queuecomplete,
-      files: this.files
+      files: this.files,
+      accept: this.accept,
+      renameFile: this.renameFile,
     };
 
     for (let e in events) {
@@ -127,6 +131,40 @@ export default Ember.Component.extend({
       }
     }
   },
+  /**
+   * internal config cp
+   * @private
+   * @return {[type]} [description]
+   */
+  _dzConfig: Ember.computed(function(){
+    let config = this.get('config'),
+        optList = this.get('dzOptionsList'),
+        output = {};
+
+    optList.forEach((e) => {
+      // use dynamic hash first
+      if (config.hasOwnProperty(e)) {
+        output[e] = config[e];
+      }
+
+      // if property is set specifically, override
+      if (this.get(e) != null) {
+        output[e] = this.get(e);
+      }
+
+      // need to set null versions of thumbnail width / height
+      if (e === 'thumbnailHeight' || e === 'thumbnailWidth') {
+        output[e] = this.get(e);
+      }
+    });
+
+    Ember.assert('Url is required for dropzone', output.url);
+    // Preserve defaults for existing apps/tests
+    if (!output.url) {
+      output.url = '#';
+    }
+    return output;
+  }),
 
   getDropzoneOptions() {
     const onDragEnterLeaveHandler = function(dropzoneInstance) {
@@ -153,68 +191,22 @@ export default Ember.Component.extend({
       dropzoneInstance.on('dragleave', onDrag.leave);
     };
 
-    let dropzoneOptions = {};
-    let dropzoneConfig = {
-      url: this.url,
-      withCredentials: this.withCredentials,
-      method: this.method,
-      parallelUploads: this.parallelUploads,
-      maxFilesize: this.maxFilesize,
-      filesizeBase: this.filesizeBase,
-      paramName: this.paramName,
-      uploadMultiple: this.uploadMultiple,
-      headers: this.headers,
-      addRemoveLinks: this.addRemoveLinks,
-      previewsContainer: this.previewsContainer,
-      clickable: this.clickable,
-      maxThumbnailFilesize: this.maxThumbnailFilesize,
-      thumbnailWidth: this.thumbnailWidth,
-      thumbnailHeight: this.thumbnailHeight,
-      maxFiles: this.maxFiles,
-      createImageThumbnails: this.createImageThumbnails,
-
-      // resize: not available
-      acceptedFiles: this.acceptedFiles,
-      autoProcessQueue: this.autoProcessQueue,
-      forceFallback: this.forceFallback,
-      previewTemplate: this.previewTemplate,
-
-      // Dropzone translations
-      dictDefaultMessage: this.dictDefaultMessage,
-      dictFallbackMessage: this.dictFallbackMessage,
-      dictFallbackText: this.dictFallbackText,
-      dictInvalidFileType: this.dictInvalidFileType,
-      dictFileTooBig: this.dictFileTooBig,
-      dictResponseError: this.dictResponseError,
-      dictCancelUpload: this.dictCancelUpload,
-      dictCancelUploadConfirmation: this.dictCancelUploadConfirmation,
-      dictRemoveFile: this.dictRemoveFile,
-      dictMaxFilesExceeded: this.dictMaxFilesExceeded,
-
-      // Callback functions
-      accept: this.accept,
-
-      // Fix flickering dragging over child elements: https://github.com/enyo/dropzone/issues/438
-      dragenter: Ember.$.noop,
-      dragleave: Ember.$.noop,
-      init: function () { onDragEnterLeaveHandler(this); }
+    let config = this.get('_dzConfig');
+    config.init = function () {
+      onDragEnterLeaveHandler(this);
     };
 
-    for (let option in dropzoneConfig) {
-      let data = dropzoneConfig[option];
-      if (data !== null) {
-        dropzoneOptions[option] = data;
-      } else if (option === 'thumbnailHeight' || option === 'thumbnailWidth') {
-        dropzoneOptions[option] = data;
-      }
-    }
-
-    this.set('dropzoneOptions', dropzoneOptions);
+    this.set('dropzoneOptions', config);
   },
 
   createDropzone(element) {
-    this.set('myDropzone', new Dropzone(element, this.dropzoneOptions));
+    let region = (this.get('maxDropRegion') && (typeof FastBoot === 'undefined')) ? document.body : element;
+    this.set('myDropzone', new Dropzone(region, this.dropzoneOptions));
   },
+
+  destroyDropzone: Ember.on('willDestroyElement', function() {
+    this.get('myDropzone').destroy();
+  }),
 
   insertDropzone: Ember.on('didInsertElement', function() {
     let _this = this;
