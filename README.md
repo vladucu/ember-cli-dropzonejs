@@ -1,6 +1,6 @@
-# Ember-cli-dropzonejs
-[![Build Status](https://travis-ci.org/FutoRicky/ember-cli-dropzonejs.svg?branch=test%2Ftarvis-ci-implementation)](https://travis-ci.org/FutoRicky/ember-cli-dropzonejs)
+# ![](http://i67.tinypic.com/2hq6zcx.png)
 [![Ember Observer Score](https://emberobserver.com/badges/ember-cli-dropzonejs.svg)](https://emberobserver.com/addons/ember-cli-dropzonejs)
+[ ![Codeship Status for FutoRicky/ember-cli-dropzonejs](https://app.codeship.com/projects/81fd6b80-1a72-0136-d790-5ac25dfa0b5f/status?branch=master)](https://app.codeship.com/projects/284304)
 
 Drag and drop file uploader addon for ember-cli using [Dropzonejs](http://www.dropzonejs.com/).
 
@@ -8,19 +8,19 @@ Drag and drop file uploader addon for ember-cli using [Dropzonejs](http://www.dr
 
 Versions
 -------------
-Current version is running ember-cli >= `2.8.0`
+Current version is running ember-cli >= `2.13.1`
 
-Versions 0.8.6 <= are running ember-cli `1.13.8` 
+Versions 0.8.6 <= are running ember-cli `1.13.8`
 
 
 Installation
 -------------
 `ember install ember-cli-dropzonejs`
 
-This addon will use dropzone's default css by default. If you prefer to use your own css, add this option to your `Brocfile.js`:
+This addon will use dropzone's default css by default. If you prefer to use your own css, add this option to your `ember-cli-build.js`:
 
 ```javascript
-var app = new EmberApp({
+var app = new EmberApp(defaults, {
   ---
   emberCliDropzonejs: {
     includeDropzoneCss: false
@@ -42,7 +42,40 @@ example:
 
 `{{drop-zone url='http://example.com/example' clickable=false addRemoveLinks=true}}`
 
-####Event Handling
+You can also use dynamic options:
+
+```
+// controller.js
+
+import Ember from 'ember';
+
+export default Ember.Controller.extend({
+  addedfile: Ember.computed(function() {
+    return function() {
+      Ember.Logger.debug('addedFile happened');
+    };
+  }),
+  options: Ember.computed(function() {
+    return {
+      url: '#',
+      addRemoveLinks: true,
+      autoProcessQueue: false,
+      addedfile: this.addedfile
+    };
+  })
+});
+
+```
+
+```
+// template.js
+
+{{drop-zone config=options}}
+```
+
+If you would like to use the whole document body as a drop location you can set `maxDropRegion` to true
+
+#### Event Handling
 [Dropzonejs Events Docs](http://www.dropzonejs.com/#events)
 
 
@@ -58,7 +91,7 @@ To use events, set your event handler in your controller like so:
 
 and set it in your component declaration:
 
-`{{drop-zone url='http://example.com/example' addfile=addedFileEvent}}`
+`{{drop-zone url='http://example.com/example' addedfile=addedFileEvent}}`
 
 **Remember to add an url, this addon will not work without it**
 
