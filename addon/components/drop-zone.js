@@ -32,7 +32,7 @@ export default Ember.Component.extend({
     'createImageThumbnails', 'params', 'acceptedFiles', 'autoProcessQueue', 'forceFallback',
     'previewTemplate', 'dictDefaultMessage', 'dictFallbackMessage', 'dictInvalidFileType',
     'dictFallbackText', 'dictFileTooBig', 'dictResponseError', 'dictCancelUpload',
-    'dictCancelUploadConfirmation', 'dictRemoveFile', 'dictMaxFilesExceeded', 'maxDropRegion'
+    'dictCancelUploadConfirmation', 'dictRemoveFile', 'dictMaxFilesExceeded', 'maxDropRegion', 'accept'
   ],
 
   /**
@@ -121,7 +121,6 @@ export default Ember.Component.extend({
       reset: this.reset,
       queuecomplete: this.queuecomplete,
       files: this.files,
-      accept: this.accept,
       renameFile: this.renameFile,
     };
 
