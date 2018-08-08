@@ -203,11 +203,19 @@ export default Ember.Component.extend({
     this.set('myDropzone', new Dropzone(region, this.dropzoneOptions));
   },
 
-  destroyDropzone: Ember.on('willDestroyElement', function() {
-    this.get('myDropzone').destroy();
-  }),
+  willDestroyElement() {
+    this._super(...arguments);
 
-  insertDropzone: Ember.on('didInsertElement', function() {
+    if (this.get('isDestroyed') || this.get('isDestroying')) {
+      return;
+    }
+
+    this.get('myDropzone').destroy();
+  },
+
+  didInsertElement() {
+    this._super(...arguments);
+
     let _this = this;
     this.getDropzoneOptions();
     Dropzone.autoDiscover = false;
@@ -246,7 +254,7 @@ export default Ember.Component.extend({
     }
 
     return this.myDropzone;
-  }),
+  },
 
   init() {
     this._super(...arguments);
