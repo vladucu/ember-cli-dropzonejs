@@ -32,7 +32,7 @@ export default Ember.Component.extend({
     'createImageThumbnails', 'params', 'acceptedFiles', 'autoProcessQueue', 'forceFallback',
     'previewTemplate', 'dictDefaultMessage', 'dictFallbackMessage', 'dictInvalidFileType',
     'dictFallbackText', 'dictFileTooBig', 'dictResponseError', 'dictCancelUpload',
-    'dictCancelUploadConfirmation', 'dictRemoveFile', 'dictMaxFilesExceeded', 'maxDropRegion'
+    'dictCancelUploadConfirmation', 'dictRemoveFile', 'dictMaxFilesExceeded', 'maxDropRegion', 'accept'
   ],
 
   /**
@@ -121,7 +121,6 @@ export default Ember.Component.extend({
       reset: this.reset,
       queuecomplete: this.queuecomplete,
       files: this.files,
-      accept: this.accept,
       renameFile: this.renameFile,
     };
 
@@ -204,11 +203,21 @@ export default Ember.Component.extend({
     this.set('myDropzone', new Dropzone(region, this.dropzoneOptions));
   },
 
-  destroyDropzone: Ember.on('willDestroyElement', function() {
-    this.get('myDropzone').destroy();
-  }),
+  // NOTE: Commenting out...this messes with the way we are preloading server-side images
+  // because it's calling the `removedfile` event for everything on destroy
+  // willDestroyElement() {
+  //   this._super(...arguments);
 
-  insertDropzone: Ember.on('didInsertElement', function() {
+  //   if (this.get('isDestroyed') || this.get('isDestroying')) {
+  //     return;
+  //   }
+
+  //   this.get('myDropzone').destroy();
+  // },
+
+  didInsertElement() {
+    this._super(...arguments);
+
     let _this = this;
     this.getDropzoneOptions();
     Dropzone.autoDiscover = false;
@@ -225,7 +234,6 @@ export default Ember.Component.extend({
           type: file.get('type'),
           size: file.get('size'),
           status: Dropzone.ADDED,
-          accepted: true,
           //add support for id  in files object so that it can be access in addedFile,removedFile callbacks for files identified by id
           id: file.get('id')
         };
@@ -242,12 +250,12 @@ export default Ember.Component.extend({
         }
 
         _this.myDropzone.emit('complete', dropfile);
-        _this.myDropzone.files.push(dropfile);
+        _this.myDropzone.files.push(file);
       });
     }
 
     return this.myDropzone;
-  }),
+  },
 
   init() {
     this._super(...arguments);
